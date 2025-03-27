@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XOX Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-color: #282c34;
+            margin: 0;
+            color: #ffffff;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #61dafb;
+        }
+
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+        }
+
+        .cell {
+            background-color: #61dafb;
+            border: 2px solid #000;
+            font-size: 2em;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #282c34;
+        }
+
+        .cell.taken {
+            cursor: not-allowed;
+            background-color: #cccccc;
+            color: #000;
+        }
+
+        .cell.winner {
+            text-decoration: line-through;
+            background-color: #32CD32; /* Lime Green */
+            color: white;
+        }
+
+        .winner-message {
+            display: none;
+            font-size: 1.5em;
+            color: #32CD32; /* Lime Green */
+        }
+
+        .restart-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .restart-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>XOX Game</h1>
+        <div id="board">
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+        </div>
+        <h2 id="winner-message" class="winner-message">Winner: <span id="winner"></span></h2>
+        <button id="restart-btn" class="restart-btn">Restart Game</button>
+    </div>
+    <script>
+        const cells = document.querySelectorAll("[data-cell]");
+        const winnerMessage = document.getElementById("winner-message");
+        const winnerDisplay = document.getElementById("winner");
+        const restartButton = document.getElementById("restart-btn");
+        let currentPlayer = "X";
+
+        const winningCombinations = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function checkWinner() {
+            for (let combination of winningCombinations) {
+                const [a, b, c] = combination;
+                if (
+                    cells[a].innerText === currentPlayer &&
+                    cells[b].innerText === currentPlayer &&
+                    cells[c].innerText === currentPlayer
+                ) {
+                    // Add visual effect
+                    cells[a].classList.add("winner");
+                    cells[b].classList.add("winner");
+                    cells[c].classList.add("winner");
+                    winnerDisplay.innerText = currentPlayer;
+                    winnerMessage.style.display = "block";
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        function handleClick(e) {
+            const cell = e.target;
+
+            if (cell.classList.contains("taken") || winnerMessage.style.display === "block") {
+                return;
+            }
+
+            cell.innerText = currentPlayer;
+            cell.classList.add("taken");
+
+            if (checkWinner()) {
+                return;
+            }
+
+            currentPlayer = currentPlayer === "X" ? "O" : "X";
+        }
+
+        function restartGame() {
+            cells.forEach((cell) => {
+                cell.innerText = "";
+                cell.classList.remove("taken", "winner");
+            });
+            currentPlayer = "X";
+            winnerMessage.style.display = "none";
+        }
+
+        cells.forEach((cell) => cell.addEventListener("click", handleClick));
+        restartButton.addEventListener("click", restartGame);
+    </script>
+</body>
+</html>
